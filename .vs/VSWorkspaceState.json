@@ -1,8 +1,9 @@
 {
   "ExpandedNodes": [
     "",
-    "\\PeachParty"
+    "\\PeachParty",
+    "\\PeachParty\\PeachParty"
   ],
-  "SelectedNode": "\\PeachParty\\PeachParty.sln",
+  "SelectedNode": "\\PeachParty\\PeachParty\\GameController.cpp",
   "PreviewInSolutionExplorer": false
 }
