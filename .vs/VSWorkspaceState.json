@@ -1,7 +1,9 @@
 {
   "ExpandedNodes": [
-    ""
+    "",
+    "\\PeachParty",
+    "\\PeachParty\\PeachParty"
   ],
-  "SelectedNode": "\\PeachParty.sln",
+  "SelectedNode": "\\PeachParty\\PeachParty\\GraphObject.h",
   "PreviewInSolutionExplorer": false
 }

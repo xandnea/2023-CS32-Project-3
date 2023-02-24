@@ -71,8 +71,20 @@ void PlayerAvatar::doSomething()
 	if (getState() == WALKING) {
 		// if the avatar is directly on top of a directional square
 		// else if the avatar is directly on top of a square at a fork 
-		if ()
+		// if ()
 	}
 }
 
 PlayerAvatar::~PlayerAvatar() { } // idk what to delete
+
+// SQUARE IMPLEMENTATION
+Square::Square(StudentWorld* studentWorld, int imageID, int startX, int startY, int startDir)
+	: Actor(studentWorld, imageID, startX, startY, startDir, 1)
+{
+
+}
+
+Square::~Square()
+{
+
+}

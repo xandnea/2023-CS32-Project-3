@@ -86,4 +86,16 @@ private:
 	int m_state;
 };
 
+class Square : public Actor
+{
+public:
+	// Constructor
+	Square(StudentWorld* studentWorld, int imageID, int startX, int startY, int startDir);
+
+	// Destructor
+	~Square();
+
+private:
+
+};
 #endif // ACTOR_H_
