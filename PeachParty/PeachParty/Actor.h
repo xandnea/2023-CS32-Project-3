@@ -4,26 +4,37 @@
 #include "GraphObject.h"
 #include "StudentWorld.h"
 
+class Board;
+
 const int WAITING_TO_ROLL = 0;
 const int WALKING = 1;
+const int PAUSED = 2;
 
 const int PLAYER_ONE = 1;
 const int PLAYER_TWO = 2;
 
 // Students:  Add code to this file, Actor.cpp, StudentWorld.h, and StudentWorld.cpp
 
-class Actor : public GraphObject {
+class Actor : public GraphObject 
+{
 public:
 	Actor(StudentWorld* studentWorld, int imageID, int startX, int startY, int startDir, int depth); // need to set GraphObject IID, x, and y 
 
+	// Getters
 	inline
-		bool isActive() { return m_active; } // check if object is active
+		bool isActive() const { return m_active; } 
 	inline
-		void setActive(bool active) { m_active = active; } // setter
-	inline
-		StudentWorld* getWorld() { return m_studentWorld; } // return pointer to student world
+		StudentWorld* getWorld() { return m_studentWorld; }
 
-	virtual void doSomething() = 0; // pure virtual 
+	// Setters
+	inline
+		void setActive(bool active) { m_active = active; } 
+
+	// Pure Virtual
+	virtual void doSomething() = 0;
+
+	inline
+		virtual bool isImpactable() { return false; }
 
 	virtual ~Actor();
 
@@ -33,69 +44,316 @@ private:
 
 };
 
-class PlayerAvatar : public Actor {
+class Character : public Actor 
+{
 public:
 	// Constructor
-	PlayerAvatar(StudentWorld* studentWorld, int player, int imageID, int startX, int startY);
+	Character(StudentWorld* studentWorld, Board* board, int initialState, int imageID, int startX, int startY, int depth);
 
 	// Getters
 	inline
-		int getPlayerNum() { return m_player; }
+		Board* getBoard() const { return m_board; }
 	inline
-		int getNumCoins() { return m_numCoins; }
+		int getTicks() const { return m_ticksToMove; }
 	inline
-		int getNumStars() { return m_numStars; }
+		int getState() const { return m_state; }
 	inline
-		bool checkVortex() { return m_vortex; }
-	inline
-		int getTicks() { return m_ticksToMove; }
-	inline
-		int getState() { return m_state; }
-	
+		int getWalkDir() const { return m_walkDir; }
+
 	// Setters
-	inline
-		void setNumCoins(int coins) { m_numCoins += coins; }
-	inline
-		void setNumStars(int stars) { m_numStars += stars; }
-	inline
-		void setVortex(bool vortex) { m_vortex = vortex; }
 	inline
 		void setTicks(int ticks) { m_ticksToMove = ticks; }
 	inline
 		void changeTicks(int ticks) { m_ticksToMove += ticks; }
 	inline
 		void setState(int state) { m_state = state; }
+	inline
+		void setWalkDir(int dir) { m_walkDir = dir; }
 
-	void swapCoins(PlayerAvatar& playerAvatar); // might want to use a pointer to playerAvatar instead
+	// Destructor
+	virtual ~Character();
+
+private:
+	Board* m_board;
+	int m_ticksToMove;
+	int m_state;
+	int m_walkDir;
+};
+
+class PlayerAvatar : public Character {
+public:
+	// Constructor
+	PlayerAvatar(StudentWorld* studentWorld, Board* board, int player, int imageID, int startX, int startY);
+
+	// Getters
+	inline
+		int getPlayerNum() const { return m_player; }
+	inline
+		int getNumCoins() const { return m_numCoins; }
+	inline
+		int getNumStars() const { return m_numStars; }
+	inline
+		int getDieRoll() const { return m_dieRoll; }
+	inline
+		bool checkVortex() const { return m_vortex; }
 	
-	void swapPosAndState(PlayerAvatar& playerAvatar);
+	// Setters
+	inline
+		void setNumCoins(int coins) { m_numCoins = coins; }
+	inline
+		void setNumStars(int stars) { m_numStars = stars; }
+	inline
+		void addCoins(int coins) 
+	{
+		if (m_numCoins + coins < 0)
+			m_numCoins = 0;
+		else
+			m_numCoins += coins;
+	}
+	inline
+		void addStars(int stars) 
+	{
+		if (m_numStars + stars < 0)
+			m_numStars = 0;
+		else
+			m_numStars += stars;
+	}
+	inline
+		void setDieRoll(int roll) { m_dieRoll = roll; }
+	inline
+		void changeDieRoll(int roll) { m_dieRoll += roll; }
+	inline
+		void setVortex(bool vortex) { m_vortex = vortex; }
+
+	std::string hasVortex() const;
+
+	void swapCoins(PlayerAvatar* playerAvatar); // might want to use a pointer to playerAvatar instead
+	
+	void swapPosAndState(PlayerAvatar* playerAvatar);
 
 	void teleportPlayer(int x, int y);
+
+	void teleportRandom();
 
 	void doSomething(); // no longer pure virtual
 
 	// Destructor
-	~PlayerAvatar();
+	virtual ~PlayerAvatar();
 
 private:
 	int m_player;
 	int m_numCoins;
 	int m_numStars;
+	int m_dieRoll;
 	bool m_vortex;
-	int m_ticksToMove;
-	int m_state;
 };
 
 class Square : public Actor
 {
 public:
 	// Constructor
-	Square(StudentWorld* studentWorld, int imageID, int startX, int startY, int startDir);
+	Square(StudentWorld* studentWorld, PlayerAvatar* peach, PlayerAvatar* yoshi, int imageID, int startX, int startY, int startDir);
+
+	// Getter
+	inline
+		PlayerAvatar* getPeach() const { return Peach; }
+	inline
+		PlayerAvatar* getYoshi() const { return Yoshi; }
+	inline
+		int isPeachOn() const { return m_peachOn; }
+	inline
+		int isYoshiOn() const { return m_yoshiOn; }
+	//Setter
+	inline
+		void setPeachOn(bool isOn) { m_peachOn = isOn; }
+	inline
+		void setYoshiOn(bool isOn) { m_yoshiOn = isOn; }
+
+	inline
+		virtual bool isImpactable() { return false; }
+
+	bool checkIfLandedOn(PlayerAvatar* player);
 
 	// Destructor
-	~Square();
+	virtual ~Square();
+
+private:
+	PlayerAvatar* Peach;
+	PlayerAvatar* Yoshi;
+	bool m_peachOn;
+	bool m_yoshiOn;
+};
+
+class CoinSquare : public Square
+{
+public:
+	// Constructor
+	CoinSquare(StudentWorld* studentWorld, PlayerAvatar* peach, PlayerAvatar* yoshi, char sign, int imageID, int startX, int startY);
+
+	// Getter
+	inline
+		char getSign() { return m_sign; }
+
+	void doSomething(); // no longer pure virtual
+
+	// Destructor
+	virtual ~CoinSquare();
+
+private:
+	char m_sign;
+};
+
+class StarSquare : public Square
+{
+public:
+	// Constructor
+	StarSquare(StudentWorld* studentWorld, PlayerAvatar* peach, PlayerAvatar* yoshi, int imageID, int startX, int startY);
+
+	//// Getters
+	//inline
+	//	int getPTicksOn() const { return m_pTicksOn; }
+	//inline
+	//	int getYTicksOn() const { return m_yTicksOn; }
+
+	//// Setters
+	//inline
+	//	void setPTicksOn(int ticks) { m_pTicksOn = ticks; }
+	//inline
+	//	void setYTicksOn(int ticks) { m_yTicksOn = ticks; }
+
+	void doSomething(); // no longer pure virtual
+
+	// Destructor
+	virtual ~StarSquare();
+
+private:
+	//int m_pTicksOn;
+	//int m_yTicksOn;
+};
+
+class DirectionalSquare : public Square
+{
+public:
+	// Constructor
+	DirectionalSquare(StudentWorld* studentWorld, PlayerAvatar* peach, PlayerAvatar* yoshi, char dir, int imageID, int startX, int startY);
+
+	// Getters
+	inline
+		char getDir() const { return m_dir; }
+
+	// Setters
+	inline
+		void setDir(char dir) { m_dir = dir; }
+
+	void doSomething(); // no longer pure virtual
+
+	// Destructor
+	virtual ~DirectionalSquare();
+
+private:
+	char m_dir;
+};
+
+class BankSquare : public Square
+{
+public:
+	// Constructor
+	BankSquare(StudentWorld* studentWorld, PlayerAvatar* peach, PlayerAvatar* yoshi, int imageID, int startX, int startY);
+
+	void doSomething(); // no longer pure virtual
+
+	// Destructor
+	virtual ~BankSquare();
 
 private:
 
 };
+
+class EventSquare : public Square
+{
+public:
+	// Constructor
+	EventSquare(StudentWorld* studentWorld, PlayerAvatar* peach, PlayerAvatar* yoshi, int imageID, int startX, int startY);
+
+	void doSomething(); // no longer pure virtual
+
+	// Destructor
+	virtual ~EventSquare();
+
+private:
+
+};
+
+class DroppingSquare : public Square
+{
+public:
+	// Constructor
+	DroppingSquare(StudentWorld* studentWorld, PlayerAvatar* peach, PlayerAvatar* yoshi, int imageID, int startX, int startY);
+
+	void doSomething(); // no longer pure virtual
+
+	// Destructor
+	virtual ~DroppingSquare();
+
+private:
+
+};
+
+class Enemy : public Character
+{
+public:
+	// Constructor
+	Enemy(StudentWorld* studentWorld, Board* board, int imageID, int startX, int startY);
+
+	// Getters
+	inline
+		int getTravelDist() const { return m_travelDist; }
+
+	// Setters
+	inline
+		void changeTravelDist(int change) { m_travelDist += change; }
+
+	inline
+		virtual bool isImpactable() { return true; }
+
+	// Destructor
+	virtual ~Enemy();
+
+private:
+	int m_travelDist;
+};
+
+class Bowser : public Enemy
+{
+public:
+	// Constructor
+	Bowser(StudentWorld* studentWorld, Board* board, int imageID, int startX, int startY);
+
+	void doSomething();
+
+	void whenImpacted();
+	
+	// Destructor
+	virtual ~Bowser();
+
+private:
+};
+
+class Boo : public Enemy
+{
+public:
+	// Constructor
+	Boo(StudentWorld* studentWorld, Board* board, int imageID, int startX, int startY);
+
+	void doSomething();
+
+	void whenImpacted();
+
+	// Destructor
+	virtual ~Boo();
+
+private:
+};
+
+
 #endif // ACTOR_H_

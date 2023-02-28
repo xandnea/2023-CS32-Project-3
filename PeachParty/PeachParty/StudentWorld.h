@@ -2,30 +2,44 @@
 #define STUDENTWORLD_H_
 
 #include "GameWorld.h"
-#include "Board.h"
-#include "Actor.h" // required?
 #include <string>
 #include <vector>
+#include "Board.h"
 
 // Students:  Add code to this file, StudentWorld.cpp, Actor.h, and Actor.cpp
+
+const char PLUS = '+';
+const char MINUS = '-';
+
+class Actor;
+class PlayerAvatar;
 
 class StudentWorld : public GameWorld
 {
 public:
 	StudentWorld(std::string assetPath);
+
+	// Getters
+	inline
+		int getBank() const { return m_bank; }
+
+	// Setters
+	inline
+		void setBank(int bank) { m_bank = bank; }
+	inline
+		void addToBank(int add) { m_bank += add; }
+
 	virtual int init();
 	virtual int move();
 	virtual void cleanUp();
-
-	// helpers
-	void getPlayerStartingPos(int &x, int &y);
+	~StudentWorld();
 
 private:
-	Board m_board;
 	std::string m_boardFile;
-	std::vector<Actor*> Actors;
-	Actor* Peach;
-	Actor* Yoshi;
+	std::vector<Actor*> actors;
+	Board bd;
+	PlayerAvatar* Peach;
+	PlayerAvatar* Yoshi;
 	int m_bank;
 };
 

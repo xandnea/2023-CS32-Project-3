@@ -1,4 +1,12 @@
-﻿  GameController.cpp
-  GameWorld.cpp
-  Generating Code...
+﻿  Actor.cpp
+C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(393,22): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
+C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(412,22): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
+C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(462,22): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
+C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(493,22): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
+C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(538,22): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
+C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(564,22): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
+C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(605,22): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
+C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(635,22): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
+C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(680,22): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
+C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(704,22): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
   PeachParty.vcxproj -> C:\Users\xnear\source\repos\PeachParty\PeachParty\Debug\PeachParty.exe
