@@ -21,23 +21,35 @@ StudentWorld::StudentWorld(string assetPath)
 
 int StudentWorld::init() 
 {
-    // might need to change back to "board01.txt" for part 1
     m_boardFile = "board0" + to_string(getBoardNumber()) + ".txt";
 
     Actor* actor;
 
     //Board bd;
     
-    string board_file = assetPath() + m_boardFile; // replace "board01.txt" w/ m_boardFile
+    string board_file = assetPath() + m_boardFile; 
     Board::LoadResult result = bd.loadBoard(board_file);
     if (result == Board::load_fail_file_not_found)
-        cerr << "Could not find board01.txt data file\n";
+        cerr << "Could not find board0" + to_string(getBoardNumber()) + ".txt data file\n";
     else if (result == Board::load_fail_bad_format)
         cerr << "Your board was improperly formatted\n";
     else if (result == Board::load_success) {
         cerr << "Successfully loaded board\n";
 
         Board* boardP = &bd;
+
+        for (int X = 0; X < 16; X++)
+            for (int Y = 0; Y < 16; Y++)
+            {
+                if (bd.getContentsOf(X, Y) == Board::player)
+                {
+                    Peach = new PlayerAvatar(this, boardP, PLAYER_ONE, IID_PEACH, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
+                    Yoshi = new PlayerAvatar(this, boardP, PLAYER_TWO, IID_YOSHI, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
+                    actor = new CoinSquare(this, Peach, Yoshi, PLUS, IID_BLUE_COIN_SQUARE, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
+                    actors.push_back(actor);
+                    break;
+                }
+            }
 
         for (int X = 0; X < 16; X++)
             for (int Y = 0; Y < 16; Y++)
@@ -59,18 +71,13 @@ int StudentWorld::init()
                     actor = new CoinSquare(this, Peach, Yoshi, PLUS, IID_BLUE_COIN_SQUARE, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
                     actors.push_back(actor);
                     break;
-                case Board::player:
-                    Peach = new PlayerAvatar(this, boardP, PLAYER_ONE, IID_PEACH, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
-                    Yoshi = new PlayerAvatar(this, boardP, PLAYER_TWO, IID_YOSHI, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
-                    actor = new CoinSquare(this, Peach, Yoshi, PLUS, IID_BLUE_COIN_SQUARE, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
-                    actors.push_back(actor);
-                    break;
                 case Board::red_coin_square:
                     actor = new CoinSquare(this, Peach, Yoshi, MINUS, IID_RED_COIN_SQUARE, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
                     actors.push_back(actor);
                     break;
                 case Board::blue_coin_square:
                     actor = new CoinSquare(this, Peach, Yoshi, PLUS, IID_BLUE_COIN_SQUARE, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
+                    //std::cout << "blue coin square created at: " << SPRITE_WIDTH * X << ", " << SPRITE_HEIGHT * Y << std::endl;
                     actors.push_back(actor);
                     break;
                 case Board::star_square:
@@ -86,19 +93,19 @@ int StudentWorld::init()
                     actors.push_back(actor);
                     break;
                 case Board::right_dir_square:
-                    actor = new DirectionalSquare(this, Peach, Yoshi, '>', IID_DIR_SQUARE, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
+                    actor = new DirectionalSquare(this, Peach, Yoshi, RIGHT, IID_DIR_SQUARE, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
                     actors.push_back(actor);
                     break;
                 case Board::left_dir_square:
-                    actor = new DirectionalSquare(this, Peach, Yoshi, '<', IID_DIR_SQUARE, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
+                    actor = new DirectionalSquare(this, Peach, Yoshi, LEFT, IID_DIR_SQUARE, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
                     actors.push_back(actor);
                     break;
                 case Board::up_dir_square:
-                    actor = new DirectionalSquare(this, Peach, Yoshi, '^', IID_DIR_SQUARE, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
+                    actor = new DirectionalSquare(this, Peach, Yoshi, UP, IID_DIR_SQUARE, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
                     actors.push_back(actor);
                     break;
                 case Board::down_dir_square:
-                    actor = new DirectionalSquare(this, Peach, Yoshi, 'v', IID_DIR_SQUARE, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
+                    actor = new DirectionalSquare(this, Peach, Yoshi, DOWN, IID_DIR_SQUARE, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
                     actors.push_back(actor);
                     break;
                 }
@@ -120,7 +127,9 @@ int StudentWorld::move()
     
     for (int i = 0; i < actors.size(); i++) {
         if (actors[i]->isActive())
+        {
             actors[i]->doSomething();
+        }
         else 
         {
             delete actors[i];

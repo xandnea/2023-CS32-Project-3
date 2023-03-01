@@ -10,6 +10,10 @@
 
 const char PLUS = '+';
 const char MINUS = '-';
+const char RIGHT = '>';
+const char LEFT = '<';
+const char UP = '^';
+const char DOWN = 'v';
 
 class Actor;
 class PlayerAvatar;

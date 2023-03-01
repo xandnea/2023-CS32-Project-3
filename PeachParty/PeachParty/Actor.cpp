@@ -153,8 +153,8 @@ void PlayerAvatar::doSomething()
 		int action = getWorld()->getAction(getPlayerNum());
 
 		if (action == ACTION_ROLL) {
-			//int roll = randInt(1, 10);
-			int roll = 1;
+			int roll = randInt(1, 10);
+			//int roll = 1;
 			setDieRoll(roll);
 			setTicks(m_dieRoll * 8);
 			setState(WALKING);
@@ -301,9 +301,9 @@ Square::Square(StudentWorld* studentWorld, PlayerAvatar* peach, PlayerAvatar* yo
 	m_yoshiOn = true;
 }
 
-bool Square::checkIfLandedOn(PlayerAvatar* player)
+bool Square::checkIfLandedOn(Character* ch)
 {
-	if (isDirectlyOnSquare(player) && posIsSame(player, this))
+	if (isDirectlyOnSquare(ch) && posIsSame(ch, this))
 		return true;
 	else
 		return false;
@@ -323,10 +323,7 @@ CoinSquare::CoinSquare(StudentWorld* studentWorld, PlayerAvatar* peach, PlayerAv
 
 void CoinSquare::doSomething()
 {
-	if (!isActive()) 
-		return;
-
-	if (getPeach() == nullptr || getYoshi() == nullptr)
+	if (!isActive())
 		return;
 
 	if (checkIfLandedOn(getPeach()) && (getPeach()->getState() == WAITING_TO_ROLL)) // if peach is on
@@ -581,7 +578,7 @@ void BankSquare::doSomething() // some squares don't register
 		}
 	}
 	else
-		setPeachOn(false);
+		setYoshiOn(false);
 }
 
 BankSquare::~BankSquare()
@@ -605,7 +602,7 @@ void EventSquare::doSomething()
 
 		setPeachOn(true);
 
-		int option = randInt(1, 3);
+		int option = randInt(1, 3); 
 
 		switch (option)
 		{
@@ -792,7 +789,11 @@ bool isDirectlyOnSquare(Character* character)
 	int pX = character->getX();
 	int pY = character->getY();
 
-	if (pX % SPRITE_WIDTH == 0 && pY % SPRITE_HEIGHT == 0)
+	if ((pX == 0) && (pY % SPRITE_HEIGHT == 0))
+		return true;
+	else if ((pX % SPRITE_WIDTH == 0) && (pY == 0))
+		return true;
+	else if ((pX % SPRITE_WIDTH == 0) && (pY % SPRITE_HEIGHT == 0))
 		return true;
 	else
 		return false;

@@ -34,6 +34,8 @@ public:
 	virtual void doSomething() = 0;
 
 	inline
+		virtual bool isEnemy() { return false; }
+	inline
 		virtual bool isImpactable() { return false; }
 
 	virtual ~Actor();
@@ -169,10 +171,7 @@ public:
 	inline
 		void setYoshiOn(bool isOn) { m_yoshiOn = isOn; }
 
-	inline
-		virtual bool isImpactable() { return false; }
-
-	bool checkIfLandedOn(PlayerAvatar* player);
+	bool checkIfLandedOn(Character* ch);
 
 	// Destructor
 	virtual ~Square();
@@ -313,6 +312,8 @@ public:
 	inline
 		void changeTravelDist(int change) { m_travelDist += change; }
 
+	inline
+		virtual bool isEnemy() { return true; }
 	inline
 		virtual bool isImpactable() { return true; }
 
