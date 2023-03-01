@@ -15,28 +15,28 @@ const int PLAYER_TWO = 2;
 
 // Students:  Add code to this file, Actor.cpp, StudentWorld.h, and StudentWorld.cpp
 
-class Actor : public GraphObject 
+class Actor : public GraphObject
 {
 public:
 	Actor(StudentWorld* studentWorld, int imageID, int startX, int startY, int startDir, int depth); // need to set GraphObject IID, x, and y 
 
 	// Getters
 	inline
-		bool isActive() const { return m_active; } 
+		bool isActive() const { return m_active; }
 	inline
 		StudentWorld* getWorld() { return m_studentWorld; }
 
 	// Setters
 	inline
-		void setActive(bool active) { m_active = active; } 
+		void setActive(bool active) { m_active = active; }
 
 	// Pure Virtual
 	virtual void doSomething() = 0;
 
 	inline
-		virtual bool isEnemy() { return false; }
-	inline
 		virtual bool isImpactable() { return false; }
+	inline
+		virtual bool isEnemy() { return false; }
 
 	virtual ~Actor();
 
@@ -46,7 +46,7 @@ private:
 
 };
 
-class Character : public Actor 
+class Character : public Actor
 {
 public:
 	// Constructor
@@ -98,14 +98,14 @@ public:
 		int getDieRoll() const { return m_dieRoll; }
 	inline
 		bool checkVortex() const { return m_vortex; }
-	
+
 	// Setters
 	inline
 		void setNumCoins(int coins) { m_numCoins = coins; }
 	inline
 		void setNumStars(int stars) { m_numStars = stars; }
 	inline
-		void addCoins(int coins) 
+		void addCoins(int coins)
 	{
 		if (m_numCoins + coins < 0)
 			m_numCoins = 0;
@@ -113,7 +113,7 @@ public:
 			m_numCoins += coins;
 	}
 	inline
-		void addStars(int stars) 
+		void addStars(int stars)
 	{
 		if (m_numStars + stars < 0)
 			m_numStars = 0;
@@ -129,13 +129,15 @@ public:
 
 	std::string hasVortex() const;
 
-	void swapCoins(PlayerAvatar* playerAvatar); // might want to use a pointer to playerAvatar instead
-	
+	void swapCoins(PlayerAvatar* playerAvatar);
+
+	void swapStars(PlayerAvatar* playerAvatar);
+
 	void swapPosAndState(PlayerAvatar* playerAvatar);
 
 	void teleportPlayer(int x, int y);
 
-	void teleportRandom();
+	void teleportPlayerRandom();
 
 	void doSomething(); // no longer pure virtual
 
@@ -170,6 +172,9 @@ public:
 		void setPeachOn(bool isOn) { m_peachOn = isOn; }
 	inline
 		void setYoshiOn(bool isOn) { m_yoshiOn = isOn; }
+
+	inline
+		virtual bool isImpactable() { return false; }
 
 	bool checkIfLandedOn(Character* ch);
 
@@ -302,49 +307,73 @@ class Enemy : public Character
 {
 public:
 	// Constructor
-	Enemy(StudentWorld* studentWorld, Board* board, int imageID, int startX, int startY);
+	Enemy(StudentWorld* studentWorld, Board* board, PlayerAvatar* peach, PlayerAvatar* yoshi, int imageID, int startX, int startY);
 
 	// Getters
 	inline
+		PlayerAvatar* getPeach() const { return Peach; }
+	inline
+		PlayerAvatar* getYoshi() const { return Yoshi; }
+	inline
 		int getTravelDist() const { return m_travelDist; }
+	inline
+		int getPauseCounter() const { return m_pauseCounter; }
+	inline
+		int isPeachOn() const { return m_peachOn; }
+	inline
+		int isYoshiOn() const { return m_yoshiOn; }
 
-	// Setters
+	//Setter
+	inline
+		void setPeachOn(bool isOn) { m_peachOn = isOn; }
+	inline
+		void setYoshiOn(bool isOn) { m_yoshiOn = isOn; }
 	inline
 		void changeTravelDist(int change) { m_travelDist += change; }
+	inline
+		void setPauseCounter(int counter) { m_pauseCounter = counter; }
+	inline
+		void changePauseCounter(int change) { m_pauseCounter += change; }
 
 	inline
-		virtual bool isEnemy() { return true; }
-	inline
 		virtual bool isImpactable() { return true; }
+	inline
+		virtual bool isEnemy() { return true; }
 
 	// Destructor
 	virtual ~Enemy();
 
 private:
+	PlayerAvatar* Peach;
+	PlayerAvatar* Yoshi;
+	bool m_peachOn;
+	bool m_yoshiOn;
 	int m_travelDist;
+	int m_pauseCounter;
 };
 
 class Bowser : public Enemy
 {
 public:
 	// Constructor
-	Bowser(StudentWorld* studentWorld, Board* board, int imageID, int startX, int startY);
+	Bowser(StudentWorld* studentWorld, Board* board, PlayerAvatar* peach, PlayerAvatar* yoshi, int imageID, int startX, int startY);
 
 	void doSomething();
 
 	void whenImpacted();
-	
+
 	// Destructor
 	virtual ~Bowser();
 
 private:
+
 };
 
 class Boo : public Enemy
 {
 public:
 	// Constructor
-	Boo(StudentWorld* studentWorld, Board* board, int imageID, int startX, int startY);
+	Boo(StudentWorld* studentWorld, Board* board, PlayerAvatar* peach, PlayerAvatar* yoshi, int imageID, int startX, int startY);
 
 	void doSomething();
 

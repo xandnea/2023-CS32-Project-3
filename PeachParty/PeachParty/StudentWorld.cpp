@@ -19,6 +19,20 @@ StudentWorld::StudentWorld(string assetPath)
     m_bank = 0;
 }
 
+void StudentWorld::deleteSquareAt(int X, int Y) // uses pixel 
+{
+    for (int i = 0; i < actors.size(); i++) {
+        if ((actors[i]->getX() == X) && (actors[i]->getY() == Y) && (actors[i]->isEnemy() == false))
+            actors[i]->setActive(false);
+    }
+}
+
+void StudentWorld::createDroppingSquareAt(int X, int Y)
+{
+    Actor* droppingSquare = new DroppingSquare(this, Peach, Yoshi, IID_DROPPING_SQUARE, X, Y);
+    actors.push_back(droppingSquare);
+}
+
 int StudentWorld::init() 
 {
     m_boardFile = "board0" + to_string(getBoardNumber()) + ".txt";
@@ -60,13 +74,13 @@ int StudentWorld::init()
                 case Board::empty:
                     break;
                 case Board::boo:
-                    actor = new Boo(this, boardP, IID_BOO, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
+                    actor = new Boo(this, boardP, Peach, Yoshi, IID_BOO, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
                     actors.push_back(actor);
                     actor = new CoinSquare(this, Peach, Yoshi, PLUS, IID_BLUE_COIN_SQUARE, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
                     actors.push_back(actor);
                     break;
                 case Board::bowser:
-                    actor = new Bowser(this, boardP, IID_BOWSER, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
+                    actor = new Bowser(this, boardP, Peach, Yoshi, IID_BOWSER, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
                     actors.push_back(actor);
                     actor = new CoinSquare(this, Peach, Yoshi, PLUS, IID_BLUE_COIN_SQUARE, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
                     actors.push_back(actor);

@@ -11,6 +11,7 @@ bool isOnDirSquare(Character* ch);
 bool canMoveInDir(Character* ch, int dir);
 bool isAtFork(Character* ch);
 void possibleMoveOptions(Character* ch, int& moveX, int& moveY);
+void teleportRandom(Character* ch);
 
 // ACTOR IMPLEMENTATION
 Actor::Actor(StudentWorld* studentWorld, int imageID, int startX, int startY, int startDir, int depth) 
@@ -63,6 +64,13 @@ void PlayerAvatar::swapCoins(PlayerAvatar* player)
 	this->setNumCoins(temp);
 }
 
+void PlayerAvatar::swapStars(PlayerAvatar* player)
+{
+	int temp = player->getNumStars();
+	player->setNumStars(this->getNumStars());
+	this->setNumStars(temp);
+}
+
 void PlayerAvatar::swapPosAndState(PlayerAvatar* player)
 {
 	int tempX, tempY, tempTicks, tempWalkDir, tempDir, tempState;
@@ -92,57 +100,9 @@ void PlayerAvatar::teleportPlayer(int x, int y)
 	this->moveTo(x, y);
 }
 
-void PlayerAvatar::teleportRandom()
+void PlayerAvatar::teleportPlayerRandom()
 {
-	int randX = randInt(0, 16);
-	int randY = randInt(0, 16);
-
-	while (getBoard()->getContentsOf(randX, randY) == Board::empty)
-	{
-		randX = randInt(0, 16);
-		randY = randInt(0, 16);
-	}
-
-	randX *= SPRITE_WIDTH;
-	randY *= SPRITE_HEIGHT;
-
-	this->moveTo(randX, randY);
-
-	randX /= SPRITE_WIDTH;
-	randY /= SPRITE_HEIGHT;
-
-	int dir = getWalkDir();
-
-	if ((getBoard()->getContentsOf(randX, randY + 1) == Board::empty) || (getBoard()->getContentsOf(randX, randY - 1) == Board::empty))
-	{
-		int rand = randInt(1, 2);
-		
-		if (rand == 1)
-		{
-			setWalkDir(right);
-			setDirection(right);
-		}
-		else
-		{
-			setWalkDir(left);
-			setDirection(left);
-		}
-	}
-	if ((getBoard()->getContentsOf(randX + 1, randY) == Board::empty) || (getBoard()->getContentsOf(randX - 1, randY) == Board::empty))
-	{
-		int rand = randInt(1, 2);
-
-		if (rand == 1)
-		{
-			setWalkDir(up);
-			setDirection(right);
-		}
-		else
-		{
-			setWalkDir(down);
-			setDirection(right);
-		}
-	}
+	teleportRandom(this);
 }
 
 void PlayerAvatar::doSomething()
@@ -602,12 +562,12 @@ void EventSquare::doSomething()
 
 		setPeachOn(true);
 
-		int option = randInt(1, 3); 
+		int option = randInt(1, 1); 
 
 		switch (option)
 		{
 		case 1:
-			getPeach()->teleportRandom();
+			getPeach()->teleportPlayerRandom();
 			getWorld()->playSound(SOUND_PLAYER_TELEPORT);
 			break;
 		case 2:
@@ -637,7 +597,7 @@ void EventSquare::doSomething()
 		switch (option)
 		{
 		case 1:
-			getYoshi()->teleportRandom();
+			getYoshi()->teleportPlayerRandom();
 			getWorld()->playSound(SOUND_PLAYER_TELEPORT);
 			break;
 		case 2:
@@ -725,10 +685,15 @@ DroppingSquare::~DroppingSquare()
 }
 
 // ENEMY IMPLEMENTATION
-Enemy::Enemy(StudentWorld* studentWorld, Board* board, int imageID, int startX, int startY)
+Enemy::Enemy(StudentWorld* studentWorld, Board* board, PlayerAvatar* peach, PlayerAvatar* yoshi, int imageID, int startX, int startY)
 	: Character(studentWorld, board, PAUSED, imageID, startX, startY, 0)
 {
+	Peach = peach;
+	Yoshi = yoshi;
+	m_peachOn = false;
+	m_yoshiOn = false;
 	m_travelDist = 0;
+	m_pauseCounter = 180;
 }
 
 Enemy::~Enemy()
@@ -737,20 +702,187 @@ Enemy::~Enemy()
 }
 
 // BOWSER IMPLEMENTATION
-Bowser::Bowser(StudentWorld* studentWorld, Board* board, int imageID, int startX, int startY)
-	: Enemy(studentWorld, board, imageID, startX, startY)
+Bowser::Bowser(StudentWorld* studentWorld, Board* board, PlayerAvatar* peach, PlayerAvatar* yoshi, int imageID, int startX, int startY)
+	: Enemy(studentWorld, board, peach, yoshi, imageID, startX, startY)
 {
 
 }
 
 void Bowser::doSomething()
 {
+	/*if (getState() == PAUSED)
+		std::cout << "State: PAUSED" << std::endl;
+	else
+		std::cout << "State: WALKING" << std::endl;
+	std::cout << "PausedCounter: " << getPauseCounter() << std::endl;*/
 
+	if (getState() == PAUSED)
+	{
+		if (posIsSame(getPeach(), this))
+		{
+			if (isPeachOn() == true)
+				return;
+
+			setPeachOn(true);
+
+			int option = randInt(1, 2);
+
+			if (option == 1)
+			{
+				getPeach()->setNumCoins(0);
+				getPeach()->setNumStars(0);
+				getWorld()->playSound(SOUND_BOWSER_ACTIVATE);
+			}
+		}
+		else
+			setPeachOn(false);
+
+		if (posIsSame(getYoshi(), this))
+		{
+			if (isYoshiOn() == true)
+				return;
+
+			setYoshiOn(true);
+
+			int option = randInt(1, 2);
+
+			if (option == 1)
+			{
+				getYoshi()->setNumCoins(0);
+				getYoshi()->setNumStars(0);
+				getWorld()->playSound(SOUND_BOWSER_ACTIVATE);
+			}
+		}
+		else
+			setYoshiOn(false);
+
+		changePauseCounter(-1);
+		if (getPauseCounter() == 0)
+		{
+			int squares_to_move = randInt(1, 10);
+			setTicks(squares_to_move * 8);
+
+			int dir = randInt(1, 3) * 90;
+			while (!canMoveInDir(this, dir))
+			{
+				dir = randInt(1, 3) * 90;
+			}
+			switch (dir)
+			{
+			case left:
+				setWalkDir(left);
+				setDirection(left);
+				break;
+			case right:
+				setWalkDir(right);
+				setDirection(right);
+				break;
+			case up:
+				setWalkDir(up);
+				setDirection(right);
+				break;
+			case down:
+				setWalkDir(down);
+				setDirection(right);
+				break;
+
+			}
+
+			setState(WALKING);
+		}
+	}
+	if (getState() == WALKING) // sometimes bowser gets stuck in the top left corner
+	{
+		int walkDir = getWalkDir();
+		int moveX = 0, moveY = 0;
+
+		if (!isDirectlyOnSquare(this))
+		{
+			if (walkDir == right)
+				moveX += 2;
+			if (walkDir == left)
+				moveX -= 2;
+			if (walkDir == up)
+				moveY += 2;
+			if (walkDir == down)
+				moveY -= 2;
+
+			moveTo(getX() + moveX, getY() + moveY);
+			changeTicks(-1);
+			if (getTicks() == 0)
+			{
+				setState(PAUSED);
+				setPauseCounter(180);
+
+				int chance = randInt(1, 4);
+				if (chance == 1)
+				{
+					getWorld()->deleteSquareAt(getX(), getY());
+					getWorld()->createDroppingSquareAt(getX(), getY());
+					getWorld()->playSound(SOUND_DROPPING_SQUARE_CREATED);
+				}
+			}
+			return;
+		}
+		if (isDirectlyOnSquare(this) && isAtFork(this))
+		{
+			int dir = randInt(0, 3) * 90;
+			while (!canMoveInDir(this, dir))
+			{
+				dir = randInt(0, 3) * 90;
+			}
+			switch (dir)
+			{
+			case left:
+				setWalkDir(left);
+				setDirection(left);
+				break;
+			case right:
+				setWalkDir(right);
+				setDirection(right);
+				break;
+			case up:
+				setWalkDir(up);
+				setDirection(right);
+				break;
+			case down:
+				setWalkDir(down);
+				setDirection(right);
+				break;
+
+			}
+		}
+		
+		possibleMoveOptions(this, moveX, moveY);
+
+		if (getWalkDir() == left)
+			setDirection(left);
+		else
+			setDirection(right);
+
+		moveTo(getX() + moveX, getY() + moveY);
+		changeTicks(-1);
+		if (getTicks() == 0)
+		{
+			setState(PAUSED);
+			setPauseCounter(180);
+
+			int chance = randInt(1, 4);
+			if (chance == 1)
+			{
+				getWorld()->deleteSquareAt(getX(), getY());
+				getWorld()->createDroppingSquareAt(getX(), getY());
+				getWorld()->playSound(SOUND_DROPPING_SQUARE_CREATED);
+			}
+		}
+	}
 }
 
 void Bowser::whenImpacted()
 {
-
+	teleportRandom(this);
+	setState(PAUSED);
+	setPauseCounter(180);
 }
 
 Bowser::~Bowser()
@@ -759,20 +891,169 @@ Bowser::~Bowser()
 }
 
 // BOO IMPLEMENTATION
-Boo::Boo(StudentWorld* studentWorld, Board* board, int imageID, int startX, int startY)
-	: Enemy(studentWorld, board, imageID, startX, startY)
+Boo::Boo(StudentWorld* studentWorld, Board* board, PlayerAvatar* peach, PlayerAvatar* yoshi, int imageID, int startX, int startY)
+	: Enemy(studentWorld, board, peach, yoshi, imageID, startX, startY)
 {
-
+	
 }
 
 void Boo::doSomething()
 {
+	/*if (getState() == PAUSED)
+		std::cout << "State: PAUSED" << std::endl;
+	else
+		std::cout << "State: WALKING" << std::endl;
+	std::cout << "PausedCounter: " << getPauseCounter() << std::endl;*/
 
+	if (getState() == PAUSED)
+	{
+		if (posIsSame(getPeach(), this))
+		{
+			if (isPeachOn() == true)
+				return;
+
+			setPeachOn(true);
+
+			int option = randInt(1, 2);
+
+			if (option == 1)
+				getPeach()->swapCoins(getYoshi());
+			else if (option == 2)
+				getPeach()->swapStars(getYoshi());
+			getWorld()->playSound(SOUND_BOO_ACTIVATE);
+		}
+		else
+			setPeachOn(false);
+
+		if (posIsSame(getYoshi(), this))
+		{
+			if (isYoshiOn() == true)
+				return;
+
+			setYoshiOn(true);
+
+			int option = randInt(1, 2);
+
+			if (option == 1)
+				getYoshi()->swapCoins(getPeach());
+			else if (option == 2)
+				getYoshi()->swapStars(getPeach());
+			getWorld()->playSound(SOUND_BOO_ACTIVATE);
+		}
+		else
+			setYoshiOn(false);
+
+		changePauseCounter(-1);
+		if (getPauseCounter() == 0)
+		{
+			int squares_to_move = randInt(1, 3);
+			setTicks(squares_to_move * 8);
+
+			int dir = randInt(1, 3) * 90;
+			while (!canMoveInDir(this, dir))
+			{
+				dir = randInt(1, 3) * 90;
+			}
+			switch (dir)
+			{
+			case left:
+				setWalkDir(left);
+				setDirection(left);
+				break;
+			case right:
+				setWalkDir(right);
+				setDirection(right);
+				break;
+			case up:
+				setWalkDir(up);
+				setDirection(right);
+				break;
+			case down:
+				setWalkDir(down);
+				setDirection(right);
+				break;
+
+			}
+
+			setState(WALKING);
+		}
+	}
+	if (getState() == WALKING) // sometimes boo gets stuck in the top left corner
+	{
+		int walkDir = getWalkDir();
+		int moveX = 0, moveY = 0;
+
+		if (!isDirectlyOnSquare(this))
+		{
+			if (walkDir == right)
+				moveX += 2;
+			if (walkDir == left)
+				moveX -= 2;
+			if (walkDir == up)
+				moveY += 2;
+			if (walkDir == down)
+				moveY -= 2;
+
+			moveTo(getX() + moveX, getY() + moveY);
+			changeTicks(-1);
+			if (getTicks() == 0)
+			{
+				setState(PAUSED);
+				setPauseCounter(180);
+			}
+			return;
+		}
+		if (isDirectlyOnSquare(this) && isAtFork(this))
+		{
+			int dir = randInt(0, 3) * 90;
+			while (!canMoveInDir(this, dir))
+			{
+				dir = randInt(0, 3) * 90;
+			}
+			switch (dir)
+			{
+			case left:
+				setWalkDir(left);
+				setDirection(left);
+				break;
+			case right:
+				setWalkDir(right);
+				setDirection(right);
+				break;
+			case up:
+				setWalkDir(up);
+				setDirection(right);
+				break;
+			case down:
+				setWalkDir(down);
+				setDirection(right);
+				break;
+
+			}
+		}
+
+		possibleMoveOptions(this, moveX, moveY);
+
+		if (getWalkDir() == left)
+			setDirection(left);
+		else
+			setDirection(right);
+
+		moveTo(getX() + moveX, getY() + moveY);
+		changeTicks(-1);
+		if (getTicks() == 0)
+		{
+			setState(PAUSED);
+			setPauseCounter(180);
+		}
+	}
 }
 
 void Boo::whenImpacted()
 {
-
+	teleportRandom(this);
+	setState(PAUSED);
+	setPauseCounter(180);
 }
 
 Boo::~Boo()
@@ -986,6 +1267,59 @@ void possibleMoveOptions(Character* ch, int& moveX, int& moveY)
 			moveY -= 2;
 		}
 		break;
+	}
+}
+
+void teleportRandom(Character* ch)
+{
+	int randX = randInt(0, 16);
+	int randY = randInt(0, 16);
+
+	while (ch->getBoard()->getContentsOf(randX, randY) == Board::empty)
+	{
+		randX = randInt(0, 16);
+		randY = randInt(0, 16);
+	}
+
+	randX *= SPRITE_WIDTH;
+	randY *= SPRITE_HEIGHT;
+
+	ch->moveTo(randX, randY);
+
+	randX /= SPRITE_WIDTH;
+	randY /= SPRITE_HEIGHT;
+
+	int dir = ch->getWalkDir();
+
+	if ((ch->getBoard()->getContentsOf(randX, randY + 1) == Board::empty) || (ch->getBoard()->getContentsOf(randX, randY - 1) == Board::empty))
+	{
+		int rand = randInt(1, 2);
+
+		if (rand == 1)
+		{
+			ch->setWalkDir(ch->right);
+			ch->setDirection(ch->right);
+		}
+		else
+		{
+			ch->setWalkDir(ch->left);
+			ch->setDirection(ch->left);
+		}
+	}
+	if ((ch->getBoard()->getContentsOf(randX + 1, randY) == Board::empty) || (ch->getBoard()->getContentsOf(randX - 1, randY) == Board::empty))
+	{
+		int rand = randInt(1, 2);
+
+		if (rand == 1)
+		{
+			ch->setWalkDir(ch->up);
+			ch->setDirection(ch->right);
+		}
+		else
+		{
+			ch->setWalkDir(ch->down);
+			ch->setDirection(ch->right);
+		}
 	}
 }
 

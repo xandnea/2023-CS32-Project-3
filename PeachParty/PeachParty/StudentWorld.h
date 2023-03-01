@@ -33,6 +33,9 @@ public:
 	inline
 		void addToBank(int add) { m_bank += add; }
 
+	void deleteSquareAt(int X, int Y);
+	void createDroppingSquareAt(int X, int Y);
+
 	virtual int init();
 	virtual int move();
 	virtual void cleanUp();
