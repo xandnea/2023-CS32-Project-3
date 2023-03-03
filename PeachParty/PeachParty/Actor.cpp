@@ -821,7 +821,7 @@ void Bowser::doSomething()
 				setState(PAUSED);
 				setPauseCounter(180);
 
-				int chance = randInt(1, 1);
+				int chance = randInt(1, 4);
 				if ((chance == 1) && (!isOnDirSquare(this)))
 				{
 					getWorld()->deleteSquareAt(getX(), getY());
