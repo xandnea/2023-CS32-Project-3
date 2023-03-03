@@ -42,7 +42,6 @@ public:
 	virtual int init();
 	virtual int move();
 	virtual void cleanUp();
-	~StudentWorld();
 
 private:
 	std::string m_boardFile;

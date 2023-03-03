@@ -769,10 +769,10 @@ void Bowser::doSomething()
 			int squares_to_move = randInt(1, 10);
 			setTicks(squares_to_move * 8);
 
-			int dir = randInt(1, 3) * 90;
+			int dir = randInt(0, 3) * 90;
 			while (!canMoveInDir(this, dir))
 			{
-				dir = randInt(1, 3) * 90;
+				dir = randInt(0, 3) * 90;
 			}
 			switch (dir)
 			{
@@ -939,10 +939,10 @@ void Boo::doSomething()
 			int squares_to_move = randInt(1, 3);
 			setTicks(squares_to_move * 8);
 
-			int dir = randInt(1, 3) * 90;
+			int dir = randInt(0, 3) * 90;
 			while (!canMoveInDir(this, dir))
 			{
-				dir = randInt(1, 3) * 90;
+				dir = randInt(0, 3) * 90;
 			}
 			switch (dir)
 			{

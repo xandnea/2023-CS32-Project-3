@@ -231,7 +231,7 @@ int StudentWorld::move()
 }
 
 void StudentWorld::cleanUp()
-{
+{   
     delete Peach;
     delete Yoshi;
 
@@ -239,9 +239,4 @@ void StudentWorld::cleanUp()
         delete actors[i];
     }
     actors.clear();
-}
-
-StudentWorld::~StudentWorld()
-{
-    cleanUp();
 }
