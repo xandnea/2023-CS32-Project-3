@@ -16,21 +16,49 @@ StudentWorld::StudentWorld(string assetPath)
 {
     Peach = nullptr;
     Yoshi = nullptr;
+    vortex = nullptr;
     m_bank = 0;
 }
 
-void StudentWorld::deleteSquareAt(int X, int Y) // uses pixel 
+void StudentWorld::deleteSquareAt(int X, int Y) // uses pixel value
 {
     for (int i = 0; i < actors.size(); i++) {
         if ((actors[i]->getX() == X) && (actors[i]->getY() == Y) && (actors[i]->isEnemy() == false))
+        {
             actors[i]->setActive(false);
+            return;
+        }
     }
 }
 
-void StudentWorld::createDroppingSquareAt(int X, int Y)
+void StudentWorld::createDroppingSquareAt(int X, int Y) // uses pixel value
 {
     Actor* droppingSquare = new DroppingSquare(this, Peach, Yoshi, IID_DROPPING_SQUARE, X, Y);
     actors.push_back(droppingSquare);
+}
+
+void StudentWorld::fireVortex(int X, int Y, int dir)
+{
+    vortex = new Vortex(this, Peach, Yoshi, IID_VORTEX, X, Y, dir);
+    actors.push_back(vortex);
+}
+
+void StudentWorld::checkIfVortexHit()
+{
+    if (vortex == nullptr)
+        return;
+    
+    int X = vortex->getX(), Y = vortex->getY();
+
+    for (int i = 0; i < actors.size(); i++) {
+        if ((actors[i]->getX() == X) && (actors[i]->getY() == Y) && (actors[i]->isImpactable() == true))
+        {
+            actors[i]->whenImpacted();
+            vortex->setActive(false);
+            playSound(SOUND_HIT_BY_VORTEX);
+            return;
+        }
+    }
 }
 
 int StudentWorld::init() 
@@ -91,7 +119,6 @@ int StudentWorld::init()
                     break;
                 case Board::blue_coin_square:
                     actor = new CoinSquare(this, Peach, Yoshi, PLUS, IID_BLUE_COIN_SQUARE, SPRITE_WIDTH * X, SPRITE_HEIGHT * Y);
-                    //std::cout << "blue coin square created at: " << SPRITE_WIDTH * X << ", " << SPRITE_HEIGHT * Y << std::endl;
                     actors.push_back(actor);
                     break;
                 case Board::star_square:
@@ -138,6 +165,8 @@ int StudentWorld::move()
 {
     Peach->doSomething();
     Yoshi->doSomething();
+
+    checkIfVortexHit();
     
     for (int i = 0; i < actors.size(); i++) {
         if (actors[i]->isActive())

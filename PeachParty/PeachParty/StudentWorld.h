@@ -17,6 +17,7 @@ const char DOWN = 'v';
 
 class Actor;
 class PlayerAvatar;
+class Vortex;
 
 class StudentWorld : public GameWorld
 {
@@ -35,6 +36,8 @@ public:
 
 	void deleteSquareAt(int X, int Y);
 	void createDroppingSquareAt(int X, int Y);
+	void fireVortex(int X, int Y, int dir);
+	void checkIfVortexHit();
 
 	virtual int init();
 	virtual int move();
@@ -47,6 +50,7 @@ private:
 	Board bd;
 	PlayerAvatar* Peach;
 	PlayerAvatar* Yoshi;
+	Vortex* vortex;
 	int m_bank;
 };
 

@@ -29,7 +29,7 @@ Character::Character(StudentWorld* studentWorld, Board* board, int initialState,
 {
 	m_board = board;
 	m_state = initialState;
-	m_ticksToMove = 0; // maybe need to change
+	m_ticksToMove = 0;
 	m_walkDir = right;
 }
 
@@ -119,9 +119,18 @@ void PlayerAvatar::doSomething()
 			setTicks(m_dieRoll * 8);
 			setState(WALKING);
 		}
-		// else if (action == ACTION_FIRE) {
-		//
-		// }
+		else if (action == ACTION_FIRE) {
+			if (checkVortex())
+			{
+				setVortex(false);
+				getWorld()->fireVortex(getX(), getY(), getWalkDir());
+				getWorld()->playSound(SOUND_PLAYER_FIRE);
+			}
+			else
+			{
+				return;
+			}
+		}
 		else { return; } // user didn't press a key or pressed another key
 	}
 	if (getState() == WALKING) {
@@ -340,7 +349,6 @@ StarSquare::StarSquare(StudentWorld* studentWorld, PlayerAvatar* peach, PlayerAv
 	m_yTicksOn = 0;*/
 }
 
-// does it give a star if the player lands directly?
 void StarSquare::doSomething() // might need to check for ticks (but i didn't see the need) 
 {
 	if (checkIfLandedOn(getPeach()))
@@ -407,7 +415,6 @@ DirectionalSquare::DirectionalSquare(StudentWorld* studentWorld, PlayerAvatar* p
 		setDirection(right);
 		break;
 	}
-
 }
 
 void DirectionalSquare::doSomething() // not detecting dir square in first column
@@ -486,7 +493,7 @@ BankSquare::BankSquare(StudentWorld* studentWorld, PlayerAvatar* peach, PlayerAv
 
 }
 
-void BankSquare::doSomething() // some squares don't register
+void BankSquare::doSomething() 
 {
 	if (checkIfLandedOn(getPeach()))
 	{
@@ -562,7 +569,7 @@ void EventSquare::doSomething()
 
 		setPeachOn(true);
 
-		int option = randInt(1, 1); 
+		int option = randInt(1, 3); 
 
 		switch (option)
 		{
@@ -574,10 +581,13 @@ void EventSquare::doSomething()
 			getPeach()->swapPosAndState(getYoshi());
 			setYoshiOn(true);
 			setPeachOn(true);
+			getPeach()->setDieRoll(0);
+			getYoshi()->setDieRoll(0);
 			getWorld()->playSound(SOUND_PLAYER_TELEPORT);
 			break;
 		case 3:
 			getPeach()->setVortex(true);
+			getPeach()->setDieRoll(0);
 			getWorld()->playSound(SOUND_GIVE_VORTEX);
 			break;
 		}
@@ -604,10 +614,13 @@ void EventSquare::doSomething()
 			getYoshi()->swapPosAndState(getPeach());
 			setPeachOn(true);
 			setYoshiOn(true);
+			getPeach()->setDieRoll(0);
+			getYoshi()->setDieRoll(0);
 			getWorld()->playSound(SOUND_PLAYER_TELEPORT);
 			break;
 		case 3:
 			getYoshi()->setVortex(true);
+			getYoshi()->setDieRoll(0);
 			getWorld()->playSound(SOUND_GIVE_VORTEX);
 			break;
 		}
@@ -710,12 +723,6 @@ Bowser::Bowser(StudentWorld* studentWorld, Board* board, PlayerAvatar* peach, Pl
 
 void Bowser::doSomething()
 {
-	/*if (getState() == PAUSED)
-		std::cout << "State: PAUSED" << std::endl;
-	else
-		std::cout << "State: WALKING" << std::endl;
-	std::cout << "PausedCounter: " << getPauseCounter() << std::endl;*/
-
 	if (getState() == PAUSED)
 	{
 		if (posIsSame(getPeach(), this))
@@ -814,12 +821,13 @@ void Bowser::doSomething()
 				setState(PAUSED);
 				setPauseCounter(180);
 
-				int chance = randInt(1, 4);
-				if (chance == 1)
+				int chance = randInt(1, 1);
+				if ((chance == 1) && (!isOnDirSquare(this)))
 				{
 					getWorld()->deleteSquareAt(getX(), getY());
 					getWorld()->createDroppingSquareAt(getX(), getY());
 					getWorld()->playSound(SOUND_DROPPING_SQUARE_CREATED);
+					return;
 				}
 			}
 			return;
@@ -862,19 +870,6 @@ void Bowser::doSomething()
 
 		moveTo(getX() + moveX, getY() + moveY);
 		changeTicks(-1);
-		if (getTicks() == 0)
-		{
-			setState(PAUSED);
-			setPauseCounter(180);
-
-			int chance = randInt(1, 4);
-			if (chance == 1)
-			{
-				getWorld()->deleteSquareAt(getX(), getY());
-				getWorld()->createDroppingSquareAt(getX(), getY());
-				getWorld()->playSound(SOUND_DROPPING_SQUARE_CREATED);
-			}
-		}
 	}
 }
 
@@ -899,12 +894,6 @@ Boo::Boo(StudentWorld* studentWorld, Board* board, PlayerAvatar* peach, PlayerAv
 
 void Boo::doSomething()
 {
-	/*if (getState() == PAUSED)
-		std::cout << "State: PAUSED" << std::endl;
-	else
-		std::cout << "State: WALKING" << std::endl;
-	std::cout << "PausedCounter: " << getPauseCounter() << std::endl;*/
-
 	if (getState() == PAUSED)
 	{
 		if (posIsSame(getPeach(), this))
@@ -938,6 +927,7 @@ void Boo::doSomething()
 				getYoshi()->swapCoins(getPeach());
 			else if (option == 2)
 				getYoshi()->swapStars(getPeach());
+
 			getWorld()->playSound(SOUND_BOO_ACTIVATE);
 		}
 		else
@@ -1057,6 +1047,62 @@ void Boo::whenImpacted()
 }
 
 Boo::~Boo()
+{
+
+}
+
+// VORTEX IMPLEMENTATION
+Vortex::Vortex(StudentWorld* studentWorld, PlayerAvatar* peach, PlayerAvatar* yoshi, int imageID, int startX, int startY, int dir)
+	: Actor(studentWorld, imageID, startX, startY, dir, 0)
+{
+	Peach = peach;
+	Yoshi = yoshi;
+	m_dir = dir;
+
+	switch (m_dir)
+	{
+	case up:
+		setDirection(up);
+		break;
+	case down:
+		setDirection(down);
+		break;
+	case left:
+		setDirection(left);
+		break;
+	case right:
+		setDirection(right);
+		break;
+	}
+}
+
+void Vortex::doSomething()
+{
+	if (!isActive())
+		return;
+
+	switch (getDir())
+	{
+	case up:
+		moveTo(getX(), getY() + 2);
+		break;
+	case down:
+		moveTo(getX(), getY() - 2);
+		break;
+	case left:
+		moveTo(getX() - 2, getY());
+		break;
+	case right:
+		moveTo(getX() + 2, getY());
+		break;
+	}
+
+	if ((getX() < 0) || (getX() >= VIEW_WIDTH) || (getY() < 0) || (getY() >= VIEW_HEIGHT))
+		setActive(false);
+
+}
+
+Vortex::~Vortex()
 {
 
 }

@@ -32,7 +32,9 @@ public:
 
 	// Pure Virtual
 	virtual void doSomething() = 0;
-
+	
+	inline
+		virtual void whenImpacted() {}
 	inline
 		virtual bool isImpactable() { return false; }
 	inline
@@ -123,7 +125,13 @@ public:
 	inline
 		void setDieRoll(int roll) { m_dieRoll = roll; }
 	inline
-		void changeDieRoll(int roll) { m_dieRoll += roll; }
+		void changeDieRoll(int roll) 
+	{ 
+		if (m_dieRoll + roll < 0)
+			m_dieRoll = 0;
+		else
+			m_dieRoll += roll;
+	}
 	inline
 		void setVortex(bool vortex) { m_vortex = vortex; }
 
@@ -383,6 +391,31 @@ public:
 	virtual ~Boo();
 
 private:
+};
+
+class Vortex : public Actor
+{
+public:
+	// Constructor
+	Vortex(StudentWorld* studentWorld, PlayerAvatar* peach, PlayerAvatar* yoshi, int imageID, int startX, int startY, int dir);
+
+	// Getters
+	inline
+		PlayerAvatar* getPeach() const { return Peach; }
+	inline
+		PlayerAvatar* getYoshi() const { return Yoshi; }
+	inline
+		int getDir() const { return m_dir; }
+	
+	void doSomething();
+
+	// Destructor
+	virtual ~Vortex();
+
+private:
+	PlayerAvatar* Peach;
+	PlayerAvatar* Yoshi;
+	int m_dir;
 };
 
 
