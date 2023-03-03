@@ -34,6 +34,8 @@ public:
 	virtual void doSomething() = 0;
 	
 	inline
+		virtual bool isDirectionalSquare() { return false; }
+	inline
 		virtual void whenImpacted() {}
 	inline
 		virtual bool isImpactable() { return false; }
@@ -256,6 +258,9 @@ public:
 	// Setters
 	inline
 		void setDir(char dir) { m_dir = dir; }
+
+	inline
+		virtual bool isDirectionalSquare() { return true; }
 
 	void doSomething(); // no longer pure virtual
 

@@ -238,7 +238,7 @@ void GameController::specialKeyboardEvent(int key, int /* x */, int /* y */)
 void GameController::playSound(int soundID)
 {
 	return;
-	/*if (soundID == SOUND_NONE)
+	if (soundID == SOUND_NONE)
 		return;
 
 	auto p = m_soundMap.find(soundID);
@@ -246,7 +246,7 @@ void GameController::playSound(int soundID)
 	{
 		string path = m_gw->assetPath();
 		SoundFX().playClip(path + p->second);
-	}*/
+	}
 }
 
 void GameController::setGameState(GameControllerState s)

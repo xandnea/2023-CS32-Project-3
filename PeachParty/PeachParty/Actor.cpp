@@ -158,7 +158,9 @@ void PlayerAvatar::doSomething()
 			return;
 		}
 
-		if (isOnDirSquare(this))
+		Actor* square = getWorld()->getPointerToSquareAt(getX(), getY());
+
+		if (square->isDirectionalSquare())
 		{
 			possibleMoveOptions(this, moveX, moveY);
 
@@ -176,6 +178,15 @@ void PlayerAvatar::doSomething()
 		else if (isAtFork(this))
 		{
 			int action = getWorld()->getAction(getPlayerNum());
+
+			if (action == ACTION_LEFT && getWalkDir() == right)
+				return;
+			if (action == ACTION_RIGHT && getWalkDir() == left)
+				return;
+			if (action == ACTION_DOWN && getWalkDir() == up)
+				return;
+			if (action == ACTION_UP && getWalkDir() == down)
+				return;
 
 			switch (action)
 			{
@@ -822,7 +833,7 @@ void Bowser::doSomething()
 				setPauseCounter(180);
 
 				int chance = randInt(1, 4);
-				if ((chance == 1) && (!isOnDirSquare(this)))
+				if (chance == 1)
 				{
 					getWorld()->deleteSquareAt(getX(), getY());
 					getWorld()->createDroppingSquareAt(getX(), getY());
@@ -927,7 +938,6 @@ void Boo::doSomething()
 				getYoshi()->swapCoins(getPeach());
 			else if (option == 2)
 				getYoshi()->swapStars(getPeach());
-
 			getWorld()->playSound(SOUND_BOO_ACTIVATE);
 		}
 		else
@@ -1126,21 +1136,21 @@ bool isDirectlyOnSquare(Character* character)
 		return false;
 }
 
-bool isOnDirSquare(Character* ch)
-{
-	int graphX = ch->getX() / SPRITE_WIDTH, graphY = ch->getY() / SPRITE_HEIGHT;
-
-	if (ch->getBoard()->getContentsOf(graphX, graphY) == Board::right_dir_square)
-		return true;
-	if (ch->getBoard()->getContentsOf(graphX, graphY) == Board::left_dir_square)
-		return true;
-	if (ch->getBoard()->getContentsOf(graphX, graphY) == Board::up_dir_square)
-		return true;
-	if (ch->getBoard()->getContentsOf(graphX, graphY) == Board::down_dir_square)
-		return true;
-
-	return false;
-}
+//bool isOnDirSquare(Character* ch)
+//{
+//	int graphX = ch->getX() / SPRITE_WIDTH, graphY = ch->getY() / SPRITE_HEIGHT;
+//
+//	if (ch->getBoard()->getContentsOf(graphX, graphY) == Board::right_dir_square)
+//		return true;
+//	if (ch->getBoard()->getContentsOf(graphX, graphY) == Board::left_dir_square)
+//		return true;
+//	if (ch->getBoard()->getContentsOf(graphX, graphY) == Board::up_dir_square)
+//		return true;
+//	if (ch->getBoard()->getContentsOf(graphX, graphY) == Board::down_dir_square)
+//		return true;
+//
+//	return false;
+//}
 
 bool posIsSame(Actor* a1, Actor* a2)
 {

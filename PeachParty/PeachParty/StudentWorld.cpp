@@ -20,9 +20,21 @@ StudentWorld::StudentWorld(string assetPath)
     m_bank = 0;
 }
 
+Actor* StudentWorld::getPointerToSquareAt(int X, int Y) // uses pixel value
+{
+    for (int i = 0; i < actors.size(); i++)
+    {
+        if ((actors[i]->getX() == X) && (actors[i]->getY() == Y) && (actors[i]->isEnemy() == false))
+        {
+            return actors[i];
+        }
+    }
+}
+
 void StudentWorld::deleteSquareAt(int X, int Y) // uses pixel value
 {
-    for (int i = 0; i < actors.size(); i++) {
+    for (int i = 0; i < actors.size(); i++) 
+    {
         if ((actors[i]->getX() == X) && (actors[i]->getY() == Y) && (actors[i]->isEnemy() == false))
         {
             actors[i]->setActive(false);
@@ -163,9 +175,6 @@ int StudentWorld::init()
 
 int StudentWorld::move()
 {
-    Peach->doSomething();
-    Yoshi->doSomething();
-
     checkIfVortexHit();
     
     for (int i = 0; i < actors.size(); i++) {
@@ -179,6 +188,9 @@ int StudentWorld::move()
             actors.erase(actors.begin() + i);
         }
     }
+
+    Peach->doSomething();
+    Yoshi->doSomething();
 
     if (timeRemaining() <= 0)
     {

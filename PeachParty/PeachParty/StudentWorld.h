@@ -34,6 +34,7 @@ public:
 	inline
 		void addToBank(int add) { m_bank += add; }
 
+	Actor* getPointerToSquareAt(int X, int Y);
 	void deleteSquareAt(int X, int Y);
 	void createDroppingSquareAt(int X, int Y);
 	void fireVortex(int X, int Y, int dir);
