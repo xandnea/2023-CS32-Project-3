@@ -1,16 +1,1 @@
-﻿  Actor.cpp
-C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(367,22): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
-C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(386,22): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
-C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(435,22): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
-C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(466,22): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
-C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(511,22): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
-C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(537,22): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
-C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(578,22): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
-C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(611,22): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
-C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(659,22): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
-C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(683,22): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
-C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(741,23): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
-C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(760,23): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
-C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(912,23): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
-C:\Users\xnear\source\repos\PeachParty\PeachParty\PeachParty\Actor.cpp(930,23): warning C4805: '==': unsafe mix of type 'int' and type 'bool' in operation
-  PeachParty.vcxproj -> C:\Users\xnear\source\repos\PeachParty\PeachParty\Debug\PeachParty.exe
+﻿  PeachParty.vcxproj -> C:\Users\xandn\source\repos\2023-CS32-Project-3\PeachParty\Debug\PeachParty.exe

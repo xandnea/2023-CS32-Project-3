@@ -7,7 +7,7 @@
 // Helpers
 bool isDirectlyOnSquare(Character* character);
 bool posIsSame(Actor* a1, Actor* a2);
-bool isOnDirSquare(Character* ch);
+//bool isOnDirSquare(Character* ch);
 bool canMoveInDir(Character* ch, int dir);
 bool isAtFork(Character* ch);
 void possibleMoveOptions(Character* ch, int& moveX, int& moveY);
@@ -738,18 +738,18 @@ void Bowser::doSomething()
 	{
 		if (posIsSame(getPeach(), this))
 		{
-			if (isPeachOn() == true)
-				return;
-
-			setPeachOn(true);
-
-			int option = randInt(1, 2);
-
-			if (option == 1)
+			if (isPeachOn() == false)
 			{
-				getPeach()->setNumCoins(0);
-				getPeach()->setNumStars(0);
-				getWorld()->playSound(SOUND_BOWSER_ACTIVATE);
+				setPeachOn(true);
+
+				int option = randInt(1, 2);
+
+				if (option == 1)
+				{
+					getPeach()->setNumCoins(0);
+					getPeach()->setNumStars(0);
+					getWorld()->playSound(SOUND_BOWSER_ACTIVATE);
+				}
 			}
 		}
 		else
@@ -757,18 +757,18 @@ void Bowser::doSomething()
 
 		if (posIsSame(getYoshi(), this))
 		{
-			if (isYoshiOn() == true)
-				return;
-
-			setYoshiOn(true);
-
-			int option = randInt(1, 2);
-
-			if (option == 1)
+			if (isYoshiOn() == false)
 			{
-				getYoshi()->setNumCoins(0);
-				getYoshi()->setNumStars(0);
-				getWorld()->playSound(SOUND_BOWSER_ACTIVATE);
+				setYoshiOn(true);
+
+				int option = randInt(1, 2);
+
+				if (option == 1)
+				{
+					getYoshi()->setNumCoins(0);
+					getYoshi()->setNumStars(0);
+					getWorld()->playSound(SOUND_BOWSER_ACTIVATE);
+				}
 			}
 		}
 		else
@@ -909,36 +909,36 @@ void Boo::doSomething()
 	{
 		if (posIsSame(getPeach(), this))
 		{
-			if (isPeachOn() == true)
-				return;
+			if (isPeachOn() == false)
+			{
+				setPeachOn(true);
 
-			setPeachOn(true);
+				int option = randInt(1, 2);
 
-			int option = randInt(1, 2);
-
-			if (option == 1)
-				getPeach()->swapCoins(getYoshi());
-			else if (option == 2)
-				getPeach()->swapStars(getYoshi());
-			getWorld()->playSound(SOUND_BOO_ACTIVATE);
+				if (option == 1)
+					getPeach()->swapCoins(getYoshi());
+				else if (option == 2)
+					getPeach()->swapStars(getYoshi());
+				getWorld()->playSound(SOUND_BOO_ACTIVATE);
+			}
 		}
 		else
 			setPeachOn(false);
 
 		if (posIsSame(getYoshi(), this))
 		{
-			if (isYoshiOn() == true)
-				return;
+			if (isYoshiOn() == false)
+			{
+				setYoshiOn(true);
 
-			setYoshiOn(true);
+				int option = randInt(1, 2);
 
-			int option = randInt(1, 2);
-
-			if (option == 1)
-				getYoshi()->swapCoins(getPeach());
-			else if (option == 2)
-				getYoshi()->swapStars(getPeach());
-			getWorld()->playSound(SOUND_BOO_ACTIVATE);
+				if (option == 1)
+					getYoshi()->swapCoins(getPeach());
+				else if (option == 2)
+					getYoshi()->swapStars(getPeach());
+				getWorld()->playSound(SOUND_BOO_ACTIVATE);
+			}
 		}
 		else
 			setYoshiOn(false);
