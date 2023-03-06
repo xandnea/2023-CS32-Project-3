@@ -26,9 +26,8 @@
     depending on when it was called
 
 2. (everything was implemented)
-  - Bug: If boo/bowser land on a player, they won't move until the player moves.
   - Bug: Sometimes after a long game bowser will randomly delete a square, not place a dropping square,
-  and randomly teleport.
+    and randomly teleport.
 
 3.
   - I set the players to start off with 0 coins
